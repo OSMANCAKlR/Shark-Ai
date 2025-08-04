@@ -61,10 +61,49 @@
     welcomeMessage: {{ block.settings.welcome_message | json }},
     voiceEnabled: {{ block.settings.voice_enabled | json }},
     livekitUrl: {{ block.settings.livekit_url | json }},
-    // Use the configured app URL for API calls
-    apiBaseUrl: {{ block.settings.app_url | default: "https://jeans-singer-grab-effort.trycloudflare.com" | json }}
+    // Dynamic API base URL - will be fetched on initialization
+    apiBaseUrl: null
   };
   window.shopId = {{ shop.id }};
+
+  // Dynamically fetch the current application URL
+  async function initializeChatConfig() {
+    try {
+      console.log('🔧 Fetching dynamic API URL...');
+      
+      // Try to fetch from the configured app URL first, with fallback
+      const configUrl = {{ block.settings.app_url | default: "https://glass-checklist-death-sale.trycloudflare.com" | json }} + '/api/config';
+      
+      const response = await fetch(configUrl);
+      if (response.ok) {
+        const config = await response.json();
+        if (config.success && config.applicationUrl) {
+          window.shopChatConfig.apiBaseUrl = config.applicationUrl;
+          console.log('✅ Dynamic API URL loaded:', config.applicationUrl);
+        } else {
+          throw new Error('Invalid config response');
+        }
+      } else {
+        throw new Error(`Config fetch failed: ${response.status}`);
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not fetch dynamic URL, using fallback:', error.message);
+      // Fallback to the configured URL
+      window.shopChatConfig.apiBaseUrl = {{ block.settings.app_url | default: "https://glass-checklist-death-sale.trycloudflare.com" | json }};
+    }
+    
+    // Initialize chat after config is loaded
+    if (window.ShopAIChat && typeof window.ShopAIChat.init === 'function') {
+      window.ShopAIChat.init();
+    }
+  }
+
+  // Initialize config when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeChatConfig);
+  } else {
+    initializeChatConfig();
+  }
 </script>
 
 {% schema %}
@@ -122,7 +161,7 @@
       "type": "text",
       "id": "app_url",
       "label": "Shopify App URL",
-      "default": "https://jeans-singer-grab-effort.trycloudflare.com",
+      "default": "https://chamber-duties-contractors-goal.trycloudflare.com",
       "info": "Your Shopify app URL from shopify.app.toml (changes when tunnel restarts)"
     }
   ]

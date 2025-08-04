@@ -3,7 +3,7 @@
 client_id = "5b3dbc4c91f99ea6c9a4e0194eddfcee"
 name = "Shark-Voice-AI"
 handle = "shark-voice-ai"
-application_url = "https://jeans-singer-grab-effort.trycloudflare.com"
+application_url = "https://keyboard-adware-celtic-nature.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "customer_read_customers,customer_read_orders,customer_read_store_credit_account_transactions,customer_read_store_credit_accounts,unauthenticated_read_product_listings"
 
 [auth]
-redirect_urls = ["https://jeans-singer-grab-effort.trycloudflare.com/auth/callback", "https://jeans-singer-grab-effort.trycloudflare.com/auth/shopify/callback", "https://jeans-singer-grab-effort.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://keyboard-adware-celtic-nature.trycloudflare.com/auth/callback", "https://keyboard-adware-celtic-nature.trycloudflare.com/auth/shopify/callback", "https://keyboard-adware-celtic-nature.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

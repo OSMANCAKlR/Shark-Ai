@@ -1157,6 +1157,52 @@
           // Connect to room
           await this.room.connect(livekitUrl, token);
 
+          // Set room metadata for the voice agent
+          try {
+            // Ensure we have the current dynamic URL for voice agent metadata
+            let apiBaseUrl = window.shopChatConfig?.apiBaseUrl;
+
+            // If apiBaseUrl is not loaded yet, try to fetch it dynamically
+            if (!apiBaseUrl) {
+              console.log(
+                "🔧 Voice: API URL not loaded, fetching dynamically...",
+              );
+              try {
+                const configResponse = await fetch("/api/config");
+                if (configResponse.ok) {
+                  const config = await configResponse.json();
+                  if (config.success && config.applicationUrl) {
+                    apiBaseUrl = config.applicationUrl;
+                    // Update the global config too
+                    window.shopChatConfig.apiBaseUrl = apiBaseUrl;
+                    console.log("✅ Voice: Fetched dynamic URL:", apiBaseUrl);
+                  }
+                }
+              } catch (error) {
+                console.warn(
+                  "⚠️ Voice: Could not fetch dynamic URL:",
+                  error.message,
+                );
+              }
+            }
+
+            // Use the loaded URL or fall back to location origin
+            const shopDomain = apiBaseUrl || window.location.origin;
+
+            const roomMetadata = {
+              shop_domain: shopDomain,
+              conversation_id: conversationId,
+              shop_id: window.shopId,
+            };
+
+            console.log("Setting room metadata:", roomMetadata);
+            await this.room.localParticipant.setMetadata(
+              JSON.stringify(roomMetadata),
+            );
+          } catch (e) {
+            console.warn("Failed to set room metadata:", e);
+          }
+
           // Enable microphone
           await this.enableMicrophone();
 
@@ -1342,8 +1388,16 @@
     },
   };
 
-  // Initialize the application when DOM is ready
+  // Export ShopAIChat to global scope for external initialization
+  window.ShopAIChat = ShopAIChat;
+
+  // Auto-initialize only if apiBaseUrl is already available (for backward compatibility)
   document.addEventListener("DOMContentLoaded", function () {
-    ShopAIChat.init();
+    if (window.shopChatConfig?.apiBaseUrl) {
+      console.log("📱 Auto-initializing chat with pre-configured URL");
+      ShopAIChat.init();
+    } else {
+      console.log("⏳ Waiting for dynamic config before initializing chat");
+    }
   });
 })();

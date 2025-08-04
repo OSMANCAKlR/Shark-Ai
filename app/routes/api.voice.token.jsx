@@ -69,13 +69,14 @@ export async function action({ request }) {
       ttl: "1h", // Token valid for 1 hour
     });
 
-    // Grant permissions
+    // Grant permissions including metadata updates
     token.addGrant({
       room: roomName,
       roomJoin: true,
       canPublish: true,
       canSubscribe: true,
       canPublishData: true,
+      canUpdateOwnMetadata: true, // Allow user to set their own metadata
     });
 
     const jwt = await token.toJwt();
