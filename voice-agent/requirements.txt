@@ -1,0 +1,11 @@
+# LiveKit Agents for voice functionality
+livekit-agents[deepgram,openai,cartesia,silero,turn-detector]==1.2.2
+
+# HTTP client for calling Remix chat API
+aiohttp>=3.8.0
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+# Optional: Enhanced noise cancellation (if using LiveKit Cloud)
+livekit-plugins-noise-cancellation>=0.2.0

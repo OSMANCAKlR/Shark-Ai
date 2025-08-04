@@ -20,6 +20,17 @@
 
     <div class="shop-ai-chat-input">
       <input type="text" placeholder="{{ 'chat.inputPlaceholder' | t }}">
+      <button class="shop-ai-chat-voice" title="Voice Chat">
+        <svg class="voice-icon-mic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+        <svg class="voice-icon-stop" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="6" width="12" height="12"></rect>
+        </svg>
+      </button>
       <button class="shop-ai-chat-send">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -27,14 +38,31 @@
         </svg>
       </button>
     </div>
+    
+    <!-- Voice Chat Status -->
+    <div class="shop-ai-voice-status" style="display: none;">
+      <div class="voice-status-indicator">
+        <div class="voice-waveform">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span class="voice-status-text">Listening...</span>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- LiveKit SDK for voice functionality -->
+<script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js" defer></script>
 
 <script src="{{ 'chat.js' | asset_url }}" defer></script>
 <script>
   window.shopChatConfig = {
     promptType: {{ block.settings.system_prompt | json }},
-    welcomeMessage: {{ block.settings.welcome_message | json }}
+    welcomeMessage: {{ block.settings.welcome_message | json }},
+    voiceEnabled: {{ block.settings.voice_enabled | json }},
+    livekitUrl: {{ block.settings.livekit_url | json }},
+    // Use the configured app URL for API calls
+    apiBaseUrl: {{ block.settings.app_url | default: "https://jeans-singer-grab-effort.trycloudflare.com" | json }}
   };
   window.shopId = {{ shop.id }};
 </script>
@@ -68,9 +96,34 @@
         {
           "value": "enthusiasticAssistant",
           "label": "Enthusiastic Assistant"
+        },
+        {
+          "value": "shopify_voice_assistant",
+          "label": "Voice Assistant (Optimized for speech)"
         }
       ],
       "default": "standardAssistant"
+    },
+    {
+      "type": "checkbox",
+      "id": "voice_enabled",
+      "label": "Enable Voice Chat",
+      "default": true,
+      "info": "Allow customers to use voice chat with the AI assistant"
+    },
+    {
+      "type": "text",
+      "id": "livekit_url",
+      "label": "LiveKit WebSocket URL",
+      "default": "wss://your-project.livekit.cloud",
+      "info": "Your LiveKit server URL (get this from LiveKit Cloud console)"
+    },
+    {
+      "type": "text",
+      "id": "app_url",
+      "label": "Shopify App URL",
+      "default": "https://jeans-singer-grab-effort.trycloudflare.com",
+      "info": "Your Shopify app URL from shopify.app.toml (changes when tunnel restarts)"
     }
   ]
 }
